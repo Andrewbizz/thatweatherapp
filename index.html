@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <link rel="stylesheet" href="style.css">
+
+  <title>Frontend Mentor | Weather app</title>
+
+  <!-- Feel free to remove these styles or customise in your own stylesheet 👍 -->
+  <style>
+    .attribution {
+      font-size: 11px;
+      text-align: center;
+    }
+
+    .attribution a {
+      color: hsl(228, 45%, 44%);
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="mainBody">
+
+    <div class="header">
+      <div class="logoCont"></div>
+      <div class="unitDropDown">
+        <div class="setTings">
+
+        </div>
+        <div>
+          units
+        </div>
+
+        <div class="DropDown">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="jumbotron">
+      <div class="jumbHeader"> How's the sky looking today?</div>
+
+      <div class="formCont">
+        <form class="searchForm">
+          <input type="text" class="searchInput" placeholder="
+  Search for a place...">
+          <button type="submit" class="searchBtn">Search</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="cardBoard">
+
+
+      <div class="cardBody">
+
+        <div class="mainCard">
+
+          <div class="leftInfo">
+            <div class="location">berlin, Germany</div>
+            <div class="dateTime"> Monday, 27 Feb 2023 </div>
+
+          </div>
+
+          <div class="rightInfo">
+            <div class="tempInfo">
+              <div class="tempValue">16°</div>
+              <div class="tempIcon"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="metricsCards">
+
+
+        </div>
+
+
+        <div class="dailyForcastCont">
+
+          <div class="forcHeader">
+            <div class="forcTitle">Daily Forecast</div>
+          </div>
+
+          <div class="dailyForcast">
+            <div class="forcastCard">
+              <div class="forcastDay">Tue</div>
+              <div class="forcastIcon cloudy"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+
+            <div class="forcastCard">
+              <div class="forcastDay">Wed</div>
+              <div class="forcastIcon snowy"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+
+            <div class="forcastCard">
+              <div class="forcastDay">Thu</div>
+              <div class="forcastIcon sunny"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+
+            <div class="forcastCard">
+              <div class="forcastDay">Fri</div>
+              <div class="forcastIcon stormy"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+
+            <div class="forcastCard">
+              <div class="forcastDay">Sat</div>
+              <div class="forcastIcon rainy"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+
+            <div class="forcastCard">
+              <div class="forcastDay">Sun</div>
+              <div class="forcastIcon partCloud"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+
+            <div class="forcastCard">
+              <div class="forcastDay">Mon</div>
+              <div class="forcastIcon windy"></div>
+              <div class="forcastTemp">
+
+                <div class="forcFrom">
+                  14°
+                </div>
+                <div class="forcTo">
+                  18°
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+
+
+
+      <div class="sideCard hourlyCard">
+
+        <div class="headDetails">
+          <div class="headTitle">Hourly Forecast</div>
+          <div class="headDayDropDown">Monday</div>
+        </div>
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon cloudy"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+
+          <div class="hourTemp">16°c</div>
+        </div>
+
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon snowy"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+          <div class="hourTemp">15°c</div>
+
+        </div>
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon sunny"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+          <div class="hourTemp">15°c</div>
+
+        </div>
+
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon stormy"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+          <div class="hourTemp">15°c</div>
+
+        </div>
+
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon rainy"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+          <div class="hourTemp">15°c</div>
+
+        </div>
+
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon partCloud"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+          <div class="hourTemp">15°c</div>
+
+        </div>
+
+        <div class="hourCard">
+
+          <div class="hourHalf">
+            <div class="hourIcon windy"></div>
+            <div class="hourTime">1am</div>
+          </div>
+
+          <div class="hourTemp">15°c</div>
+
+        </div>
+      </div>
+
+
+
+
+
+
+    </div>
+  </div>
+
+
+
+
+
+
+  <div class="attribution">
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge">Frontend Mentor</a>.
+    Coded by <a href="#">Your Name Here</a>.
+  </div>
+</body>
+
+
+<script src="script.js"></script>
+</html>
