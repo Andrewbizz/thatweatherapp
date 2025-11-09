@@ -10,6 +10,10 @@ const hourlyForecastContainer = document.querySelector(".hourlyCard");
 const searchInput = document.querySelector(".searchInput");
 const searchButton = document.querySelector(".searchBtn");
 const suggestionsContainer = document.querySelector(".suggestionsContainer"); // 🆕 New selector
+const unitsBtn = document.querySelector(".unitsBtn");
+const unitsDropdown = document.querySelector(".unitsDropdown");
+const unitOptions = document.querySelectorAll(".unitOption");
+const switchImperialBtn = document.querySelector(".switchImperialBtn");
 
 // 🌐 API Endpoints - Centralized configuration for easier maintenance
 const API_URLS = {
@@ -18,6 +22,27 @@ const API_URLS = {
     GEOCODING: "https://api.bigdatacloud.net/data/reverse-geocode-client",
     SEARCH_GEO: "https://geocoding-api.open-meteo.com/v1/search"
 };
+
+let UNITS = {
+    TEMPERATURE: 'celsius', // 'celsius' or 'fahrenheit'
+    WIND: 'kmh',            // 'kmh' or 'mph'
+    PRECIPITATION: 'mm'     // 'mm' or 'inches'
+};
+let currentWeatherData = null; // Store fetched data globally for re-rendering
+
+function toFahrenheit(c) {
+    return (c * 9 / 5) + 32;
+}
+
+ 
+function toMph(kmh) {
+    return kmh * 0.621371;
+}
+
+ 
+function toInches(mm) {
+    return mm * 0.0393701;
+}
 
 const debounce = (func, delay) => {
     let timeoutId;
@@ -29,6 +54,64 @@ const debounce = (func, delay) => {
     };
 };
 
+function setUnit(type, value) {
+    let stateKey;
+    switch (type) {
+        case 'temp':
+            stateKey = 'TEMPERATURE';
+            break;
+        case 'wind':
+            stateKey = 'WIND';
+            break;
+        case 'prec':
+            stateKey = 'PRECIPITATION';
+            break;
+        default:
+            return;
+    }
+     
+    UNITS[stateKey] = value;
+     
+    updateUnitDropdownUI(type, value);
+     
+    if (currentWeatherData) { 
+        const city = currentUserLocation.textContent; 
+        renderWeather(currentWeatherData.current, currentWeatherData, city);
+    }
+}
+
+function toggleUnitsDropdown() {
+    unitsDropdown.classList.toggle('visible'); // Assuming you have CSS to show/hide this class
+}
+
+function setAllToImperial() {
+    UNITS.TEMPERATURE = 'fahrenheit';
+    UNITS.WIND = 'mph';
+    UNITS.PRECIPITATION = 'inches';
+    
+    // Update UI for all unit groups
+    updateUnitDropdownUI('temp', 'fahrenheit');
+    updateUnitDropdownUI('wind', 'mph');
+    updateUnitDropdownUI('prec', 'inches');
+    
+    // Re-render
+    if (currentWeatherData) {
+        const city = currentUserLocation.textContent;
+        renderWeather(currentWeatherData.current, currentWeatherData, city);
+    }
+}
+
+
+function updateUnitDropdownUI(type, value) {
+    unitOptions.forEach(option => {
+        if (option.dataset.unitType === type) {
+            option.classList.remove('active');
+            if (option.dataset.unitValue === value) {
+                option.classList.add('active');
+            }
+        }
+    });
+}
 
 // ====================================================================
 // 🚀 Initialization and User Location Logic
@@ -45,7 +128,6 @@ function initializeApp() {
     searchButton.addEventListener("click", handleSearch);
     searchInput.addEventListener("keypress", (e) => {
         if (e.key === "Enter") {
-            // If suggestions are visible, select the first one instead of running a full search
             if (suggestionsContainer.children.length > 0) {
                 suggestionsContainer.children[0].click();
             } else {
@@ -57,13 +139,30 @@ function initializeApp() {
     // 🆕 Add listener for live suggestions, wrapped in a debounce
     searchInput.addEventListener("input", debounce(handleCityInput, 300));
 
-    // Clear suggestions when clicking outside the input
+    // Clear suggestions when clicking outside the input/dropdowns
     document.addEventListener('click', (e) => {
-        if (!e.target.closest('.searchContainer')) { // Assuming input and suggestions are inside a search container
+        if (!e.target.closest('.searchContainer')) { 
             suggestionsContainer.innerHTML = '';
             suggestionsContainer.style.opacity = 0;
         }
+        // Also close the units dropdown if clicked outside
+        if (!e.target.closest('.unitsContainer') && unitsDropdown.classList.contains('visible')) {
+            unitsDropdown.classList.remove('visible');
+        }
     });
+
+    // --- 🆕 Unit Dropdown Listeners ---
+    unitsBtn.addEventListener('click', toggleUnitsDropdown);
+    switchImperialBtn.addEventListener('click', setAllToImperial);
+    
+    unitOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            const type = e.currentTarget.dataset.unitType;
+            const value = e.currentTarget.dataset.unitValue;
+            setUnit(type, value);
+        });
+    });
+    // ---------------------------------
 }
 
 async function handleCityInput() {
@@ -106,14 +205,11 @@ function renderSuggestions(results) {
         
         const suggestionDiv = document.createElement('div');
         suggestionDiv.classList.add('suggestionItem');
-        suggestionDiv.textContent = formattedName;
-        
-        // Store location data directly on the element
+        suggestionDiv.textContent = formattedName; 
         suggestionDiv.dataset.lat = result.latitude;
         suggestionDiv.dataset.lon = result.longitude;
         suggestionDiv.dataset.city = formattedName;
-
-        // Attach click handler to fetch weather data
+ 
         suggestionDiv.addEventListener('click', selectSuggestion);
         
         suggestionsContainer.appendChild(suggestionDiv);
@@ -122,23 +218,17 @@ function renderSuggestions(results) {
 
 function selectSuggestion(e) {
     const { lat, lon, city } = e.target.dataset;
-    
-    // Update the input field with the selected city for visual confirmation
+     
     searchInput.value = city;
-    
-    // Clear suggestions
+     
     suggestionsContainer.innerHTML = '';
     suggestionsContainer.style.opacity = 0;
-    
-    // Fetch the weather for the selected coordinates
+     
     fetchWeather(lat, lon, city);
-
-    // Stop propagation to prevent document click clearing it immediately
+ 
     e.stopPropagation(); 
 }
-/**
- * Attempts to get the user's coordinates via Geolocation API or falls back to IP.
- */
+ 
 function getUserLocation() {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -154,19 +244,14 @@ function getUserLocation() {
     }
 }
 
-/**
- * Handles successful retrieval of user's coordinates.
- * @param {GeolocationPosition} position - The position object from Geolocation API.
- */
+ 
 async function handleLocationSuccess(position) {
     const { latitude, longitude } = position.coords;
     // cityName is null here, triggering reverse geocoding inside fetchWeather
     await fetchWeather(latitude, longitude); 
 }
 
-/**
- * Fetches location data using the user's IP address as a fallback.
- */
+ 
 async function getLocationFromIP() {
     try {
         const res = await fetch(API_URLS.IP_LOOKUP);
@@ -183,23 +268,13 @@ async function getLocationFromIP() {
     }
 }
 
-/**
- * Handles error when retrieving user's coordinates (e.g., permission denied).
- * @param {GeolocationPositionError} err - The error object.
- */
+ 
 function handleLocationError(err) {
     console.error("Geolocation Error:", err);
     currentWeatherContainer.innerHTML = `<p>Unable to retrieve location. You can use the search bar to find a city. 😔</p>`;
 }
 
-
-// ====================================================================
-// 🔍 Search Functionality
-// ====================================================================
-
-/**
- * Event handler for the search button/enter key.
- */
+ 
 async function handleSearch() {
     const cityName = searchInput.value.trim();
     if (!cityName) return;
@@ -226,42 +301,10 @@ async function handleSearch() {
         alert("Failed to search for location. Please check your network.");
     }
 }
-/**
- * Fetches coordinates for a given city name using a geocoding API.
- * @param {string} cityName - The name of the city to search for.
- */
-// async function searchLocation(cityName) {
-//     try {
-//         const searchUrl = `${API_URLS.SEARCH_GEO}?name=${cityName}&count=1&language=en&format=json`;
-//         const res = await fetch(searchUrl);
-//         const data = await res.json();
-
-//         if (data.results && data.results.length > 0) {
-//             const firstResult = data.results[0];
-//             const { latitude, longitude, name, country } = firstResult;
-//             // Use a clean, user-friendly name from the search result
-//             const formattedCityName = `${name}, ${country}`;
-            
-//             console.log("Search Result:", formattedCityName, latitude, longitude);
-            
-//             await fetchWeather(latitude, longitude, formattedCityName);
-//         } else {
-//             alert(`Location "${cityName}" not found. Try a different name.`);
-//         }
-//     } catch (error) {
-//         console.error("Location Search Error:", error);
-//         alert("Failed to search for location. Please check your network.");
-//     }
-// }
-
-
-// ====================================================================
-// ☁️ Weather Data Fetching and Geocoding
-// ====================================================================
+ 
 
  
 async function fetchWeather(latitude, longitude, cityName = null) {
-    // URL updated to include 'hourly' data (temperature_2m, weather_code)
     const url = `${API_URLS.WEATHER}?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,weather_code,relative_humidity_2m&daily=temperature_2m_max,temperature_2m_min,weather_code&hourly=temperature_2m,weather_code&timezone=auto`;
 
     try {
@@ -269,21 +312,31 @@ async function fetchWeather(latitude, longitude, cityName = null) {
         if (!res.ok) throw new Error(`Weather API returned status: ${res.status}`);
         
         const data = await res.json();
+        
+        // --- 🆕 Store data globally before potential geocoding ---
+        currentWeatherData = data;
+        // --------------------------------------------------------
 
         let finalCity = cityName;
         
-        // Only perform reverse geocoding if no city name was provided (i.e., from Geolocation API success)
         if (!finalCity) {
             finalCity = await reverseGeocode(latitude, longitude);
         }
 
-        renderCurrentWeather(data.current, data, finalCity);
-        renderDailyForecast(data.daily);
-        renderHourlyForecast(data.hourly); // Render the new hourly data
+        // Use a single wrapper function to call all rendering functions
+        renderWeather(data.current, data, finalCity);
+        
     } catch (error) {
         console.error("Weather Fetch Error:", error);
         currentWeatherContainer.innerHTML = `<p>Failed to load weather data 😔</p>`;
     }
+}
+
+// 🆕 New wrapper function to simplify re-rendering
+function renderWeather(current, data, city) {
+    renderCurrentWeather(current, data, city);
+    renderDailyForecast(data.daily);
+    renderHourlyForecast(data.hourly);
 }
 
 /**
@@ -339,10 +392,36 @@ function renderCurrentWeather(current, data, city) {
     const options = { weekday: "long", year: "numeric", month: "short", day: "numeric" };
     const formattedDate = new Date(date).toLocaleDateString(undefined, options);
 
+    // --- UNIT CONVERSION LOGIC ---
+    let currentTempVal = current.temperature_2m;
+    let apparentTempVal = current.apparent_temperature;
+    let windSpeedVal = current.wind_speed_10m;
+    let precipitationVal = current.precipitation;
+    let tempUnit = '°';
+    let windUnit = 'km/h';
+    let precUnit = 'mm';
+
+    if (UNITS.TEMPERATURE === 'fahrenheit') {
+        currentTempVal = toFahrenheit(currentTempVal);
+        apparentTempVal = toFahrenheit(apparentTempVal);
+        tempUnit = '°';
+    }
+
+    if (UNITS.WIND === 'mph') {
+        windSpeedVal = toMph(windSpeedVal);
+        windUnit = 'mph';
+    }
+
+    if (UNITS.PRECIPITATION === 'inches') {
+        precipitationVal = toInches(precipitationVal);
+        precUnit = 'in';
+    }
+    // ---------------------------
+
     const weatherHTML = `
       <div class="metricsCard">
         <div class="miniHeader">Feels Like</div>
-        <div class="metrics">${Math.round(current.apparent_temperature)}°</div>
+        <div class="metrics">${Math.round(apparentTempVal)}${tempUnit}</div>
       </div>
       <div class="metricsCard">
         <div class="miniHeader">Humidity</div>
@@ -350,17 +429,17 @@ function renderCurrentWeather(current, data, city) {
       </div>
       <div class="metricsCard">
         <div class="miniHeader">Wind</div>
-        <div class="metrics">${current.wind_speed_10m} km/h</div>
+        <div class="metrics">${windSpeedVal.toFixed(1)} ${windUnit}</div>
       </div>
       <div class="metricsCard">
         <div class="miniHeader">Precipitation</div>
-        <div class="metrics">${current.precipitation} mm</div>
+        <div class="metrics">${precipitationVal.toFixed(1)} ${precUnit}</div>
       </div>
     `;
 
     currentUserLocation.textContent = city;
     dateElement.textContent = formattedDate;
-    currentTemp.textContent = `${Math.round(current.temperature_2m)}°`;
+    currentTemp.textContent = `${Math.round(currentTempVal)}${tempUnit}`;
     currentWeatherContainer.insertAdjacentHTML("beforeend", weatherHTML);
 }
 
@@ -369,15 +448,20 @@ function renderCurrentWeather(current, data, city) {
  */
 function renderDailyForecast(daily) {
     dailyForecastContainer.innerHTML = "";
+    
+    // Determine the temperature unit and conversion function to use
+    const tempUnit = UNITS.TEMPERATURE === 'fahrenheit' ? '°' : '°'; 
+    const convertTemp = UNITS.TEMPERATURE === 'fahrenheit' ? toFahrenheit : (t) => t;
 
-    // The API provides daily data, we'll iterate through it.
     daily.time.forEach((time, i) => {
         const date = new Date(time);
         const dayName = date.toLocaleDateString("en-GB", { weekday: "short" });
-        const maxTemp = Math.round(daily.temperature_2m_max[i]);
-        const minTemp = Math.round(daily.temperature_2m_min[i]);
+        
+        // Apply conversion
+        const maxTemp = Math.round(convertTemp(daily.temperature_2m_max[i]));
+        const minTemp = Math.round(convertTemp(daily.temperature_2m_min[i]));
+        
         const code = daily.weather_code[i];
-
         const iconClass = getWeatherIconClass(code);
 
         const cardHTML = `
@@ -385,8 +469,8 @@ function renderDailyForecast(daily) {
             <div class="forcastDay">${dayName}</div>
             <div class="forcastIcon ${iconClass}"></div>
             <div class="forcastTemp">
-              <div class="forcFrom">${minTemp}°</div>
-              <div class="forcTo">${maxTemp}°</div>
+              <div class="forcFrom">${minTemp}${tempUnit}</div>
+              <div class="forcTo">${maxTemp}${tempUnit}</div>
             </div>
           </div>
         `;
@@ -404,10 +488,11 @@ function renderHourlyForecast(hourly) {
     }
     hourlyForecastContainer.innerHTML = ""; 
     
-    // We render up to the next 24 hours, starting from the next full hour provided by the API
-    const limit = Math.min(24, hourly.time.length); 
+    // Determine the temperature unit and conversion function to use
+    const tempUnit = UNITS.TEMPERATURE === 'fahrenheit' ? '°' : '°'; 
+    const convertTemp = UNITS.TEMPERATURE === 'fahrenheit' ? toFahrenheit : (t) => t;
     
-    // Header setup based on your HTML structure
+    const limit = Math.min(24, hourly.time.length); 
     const currentDayName = new Date(hourly.time[0]).toLocaleDateString("en-GB", { weekday: "long" });
     
     const headerHTML = `
@@ -421,9 +506,11 @@ function renderHourlyForecast(hourly) {
     for (let i = 0; i < limit; i++) {
         const time = new Date(hourly.time[i]);
         const hourTime = time.toLocaleTimeString("en-US", { hour: "numeric", hour12: true });
-        const temp = Math.round(hourly.temperature_2m[i]);
+        
+        // Apply conversion
+        const temp = Math.round(convertTemp(hourly.temperature_2m[i]));
+        
         const code = hourly.weather_code[i];
-
         const iconClass = getWeatherIconClass(code);
 
         const cardHTML = `
@@ -432,10 +519,9 @@ function renderHourlyForecast(hourly) {
               <div class="hourIcon ${iconClass}"></div>
               <div class="hourTime">${hourTime}</div>
             </div>
-            <div class="hourTemp">${temp}°c</div>
+            <div class="hourTemp">${temp}${tempUnit}</div>
           </div>
         `;
-        // Insert after the header
         hourlyForecastContainer.insertAdjacentHTML("beforeend", cardHTML);
     }
 }

@@ -33,15 +33,62 @@
     <div class="header">
       <div class="logoCont"></div>
       <div class="unitDropDown">
-        <div class="setTings">
 
-        </div>
-        <div>
-          units
-        </div>
 
-        <div class="DropDown">
 
+        <div class="unitsContainer">
+
+          <button class="unitsBtn">
+            <div class="setTings">
+
+            </div>
+            <div>
+              Units
+            </div>
+
+            <div class="DropDown"></div>
+          </button>
+          <div class="unitsDropdown">
+            <div class="switchImperialBtn" data-unit-system="imperial">
+              Switch to Imperial
+            </div>
+
+            <div class="unitGroup temperatureGroup">
+              <div class="unitLabel">Temperature</div>
+              <div class="unitOption active" data-unit-type="temp" data-unit-value="celsius">
+                Celsius (°C)
+                <span class="checkIcon"></span>
+              </div>
+              <div class="unitOption" data-unit-type="temp" data-unit-value="fahrenheit">
+                Fahrenheit (°F)
+                <span class="checkIcon"></span>
+              </div>
+            </div>
+
+            <div class="unitGroup windGroup">
+              <div class="unitLabel">Wind Speed</div>
+              <div class="unitOption active" data-unit-type="wind" data-unit-value="kmh">
+                km/h
+                <span class="checkIcon"></span>
+              </div>
+              <div class="unitOption" data-unit-type="wind" data-unit-value="mph">
+                mph
+                <span class="checkIcon"></span>
+              </div>
+            </div>
+
+            <div class="unitGroup precipitationGroup">
+              <div class="unitLabel">Precipitation (mm)</div>
+              <div class="unitOption active" data-unit-type="prec" data-unit-value="mm">
+                Millimeters (mm)
+                <span class="checkIcon"></span>
+              </div>
+              <div class="unitOption" data-unit-type="prec" data-unit-value="inches">
+                Inches (in)
+                <span class="checkIcon"></span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -56,7 +103,7 @@
           <button type="submit" class="searchBtn">Search</button>
 
           <div class="suggestionsContainer">
-        </div>
+          </div>
         </div>
       </div>
     </div>
@@ -312,4 +359,5 @@
 
 
 <script src="script.js"></script>
+
 </html>
