@@ -16,6 +16,10 @@
   --shadowBg:   rgba(255, 255, 255, 0.055);
   --soft-shadow:   rgb(87, 87, 87);
   --fs-base: 16px;
+    --scroll-track: rgba(255,255,255,0.03);
+  --scroll-thumb: rgba(255,255,255,0.08);
+  --scroll-thumb-hover: rgba(255,255,255,0.16);
+  --scroll-size: 10px;
 }
 
 /* Reset & base */
@@ -43,8 +47,48 @@ button { font: inherit; cursor: pointer; }
 a { color: inherit; text-decoration: none; }
 ul { list-style: none; padding: 0; margin: 0; }
  
+ 
+/* Firefox */
+*,
+*::before,
+*::after {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
 
+/* WebKit browsers */
+*::-webkit-scrollbar {
+  width: var(--scroll-size);
+  height: var(--scroll-size);
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--scroll-thumb), rgba(255,255,255,0.06));
+  border-radius: 999px;
+  min-height: 28px;
+  transition: background .18s ease;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+*::-webkit-scrollbar-thumb:hover,
+*::-webkit-scrollbar-thumb:active {
+  background: linear-gradient(180deg, var(--scroll-thumb-hover), rgba(255,255,255,0.12));
+}
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
 
+/* Slightly more prominent scrollbar for the side panel */
+.sideCard::-webkit-scrollbar { width: 12px; }
+.sideCard { scrollbar-width: thin; }
+
+/* Hide scrollbars on very small screens for cleaner UI */
+@media (max-width: 600px) {
+  *::-webkit-scrollbar { display: none; }
+  * { -ms-overflow-style: none; scrollbar-width: none; }
+}
 .header{
   display: flex;
   justify-content: space-between;
@@ -119,8 +163,9 @@ ul { list-style: none; padding: 0; margin: 0; }
 
 .searchForm{ 
   display: flex;
-  justify-content: center;
-  gap: 1rem;
+  justify-content: space-between;
+  gap: 1rem; 
+  position: relative;
 }
 
 .searchForm .searchInput{
@@ -129,12 +174,40 @@ ul { list-style: none; padding: 0; margin: 0; }
   color: var(--text);
   border-radius: var(--radius);
   padding: 1rem;
-  width: 60%;
+  width: 80%;
   height: 50px;
 }
 
 .searchInput::placeholder{
   color: var(--muted);
+}
+
+.suggestionsContainer{
+  position: absolute;
+  background-color: var(--compBgs);
+  width: 80%;
+  top: 60px;
+  left: 0;
+  border-radius: var(--radius);
+  opacity: 0;
+  padding: 6px;
+
+}
+
+.suggestionsContainer .suggestionItem:hover{
+  padding: 8px;
+ background-color: var(--shadowBg);
+ border-radius: var(--radius);
+  cursor: pointer;
+  border: solid var(--soft-shadow) 1px;
+}
+
+.suggestionsContainer .suggestionItem{
+  padding: 8px; 
+  border: solid transparent 1px;
+ border-radius: var(--radius);
+ margin: 2px;
+  cursor: pointer;
 }
 
 .searchBtn{
@@ -264,13 +337,20 @@ flex-direction: column;
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
+     max-height: 73vh;
+    overflow-y: scroll;
+    position: relative;
   gap: 1rem;
 }
 
 .headDetails{
   display: flex;
   justify-content: space-between;
+  height: 140px;
+  position: sticky;
   align-items: center;
+  top: 0;
+  background-color: var(--compBgs);
 }
 
 .hourCard{
@@ -283,6 +363,8 @@ flex-direction: column;
   padding: 0.5rem;
   align-items: center;
     background-color: var(--shadowBg);
+
+ 
 }
 
 .hourHalf{
@@ -326,4 +408,8 @@ flex-direction: column;
 
 .stormy{
   background-image: url(assets/images/icon-storm.webp);
+}
+
+.foggy{
+  background-image: url(assets/images/icon-fog.webp);
 }
