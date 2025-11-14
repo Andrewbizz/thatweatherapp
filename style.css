@@ -445,7 +445,122 @@ flex-direction: column;
     /* You might need to add a small icon using pseudo-elements or an SVG/font icon */
 }
 
+
+
+
+/* skeleton loader **/
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton-text,
+.skeleton-icon {
+  background: linear-gradient(
+    90deg,
+    var(--shadowBg) 0%,
+    var(--scroll-thumb) 50%,
+    var(--shadowBg) 100%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+  border-radius: 8px;
+  pointer-events: none;
+}
+
+.skeleton-text {
+  height: 16px;
+  width: 100%;
+}
+
+.skeleton-icon {
+  background-color: var(--shadowBg);
+  border-radius: 8px;
+}
+
+/* Size variants */
+.skeleton-xs { height: 12px; }
+.skeleton-sm { height: 16px; }
+.skeleton-md { height: 20px; }
+.skeleton-lg { height: 24px; }
+.skeleton-xl { height: 56px; width: 120px; }
+
+/* Main card skeleton */
  
+
+.mainCard.skeleton-main .leftInfo .location {
+ 
+  margin-bottom: 0.5rem;
+}
+
+ 
+ 
+
+/* Metric card skeleton */
+.metricsCard.skeleton-metric {
+  opacity: 1 !important;
+}
+
+.metricsCard.skeleton-metric .miniHeader {
+  width: 60%;
+  margin-bottom: 0.5rem;
+}
+
+.metricsCard.skeleton-metric .metrics {
+  width: 45%;
+}
+
+/* Forecast card skeleton */
+.forcastCard.skeleton-forecast {
+  opacity: 1 !important;
+}
+
+.forcastCard.skeleton-forecast .forcastDay {
+  width: 50%;
+  margin: 0 auto 0.5rem;
+}
+
+.forcastCard.skeleton-forecast .forcastIcon {
+  height: 50px;
+  width: 50px;
+  margin: auto;
+}
+
+.forcastCard.skeleton-forecast .forcFrom,
+.forcastCard.skeleton-forecast .forcTo {
+  width: 35%;
+}
+
+/* Hourly skeleton */
+.sideCard.skeleton-hourly {
+  background-color: var(--compBgs);
+}
+
+.hourCard.skeleton-hour {
+  opacity: 1 !important;
+}
+
+.hourCard.skeleton-hour .hourIcon {
+  height: 40px;
+  width: 40px;
+}
+
+.hourCard.skeleton-hour .hourTime {
+  width: 40px;
+}
+
+.hourCard.skeleton-hour .hourTemp {
+  width: 50px;
+}
+
+.headDetails .skeleton-text {
+  width: 70%;
+} 
 
 /* --- 2. Dropdown Panel Styling --- */
 .unitsDropdown {

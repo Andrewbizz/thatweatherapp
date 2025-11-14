@@ -1,6 +1,4 @@
-// ====================================================================
-// 🏠 DOM Element Selectors & API Configuration
-// ====================================================================
+ 
 const currentWeatherContainer = document.querySelector(".metricsCards");
 const currentUserLocation = document.querySelector(".location");
 const dateElement = document.querySelector(".dateTime");
@@ -14,6 +12,7 @@ const unitsBtn = document.querySelector(".unitsBtn");
 const unitsDropdown = document.querySelector(".unitsDropdown");
 const unitOptions = document.querySelectorAll(".unitOption");
 const switchImperialBtn = document.querySelector(".switchImperialBtn");
+const skeletonText = document.querySelectorAll(".skeleton-text");
 
 // 🌐 API Endpoints - Centralized configuration for easier maintenance
 const API_URLS = {
@@ -113,10 +112,7 @@ function updateUnitDropdownUI(type, value) {
     });
 }
 
-// ====================================================================
-// 🚀 Initialization and User Location Logic
-// ====================================================================
-
+ 
 // Run as soon as page loads
 window.addEventListener("load", initializeApp);
 
@@ -338,13 +334,7 @@ function renderWeather(current, data, city) {
     renderDailyForecast(data.daily);
     renderHourlyForecast(data.hourly);
 }
-
-/**
- * Performs reverse geocoding to get a city name from coordinates.
- * @param {number} lat - Latitude.
- * @param {number} lon - Longitude.
- * @returns {Promise<string>} - The formatted city name.
- */
+ 
 async function reverseGeocode(lat, lon) {
     try {
         const geoRes = await fetch(
@@ -360,16 +350,9 @@ async function reverseGeocode(lat, lon) {
     }
 }
 
-
-// ====================================================================
-// 🎨 Rendering Functions
-// ====================================================================
-
-/**
- * Maps a weather code (WMO code) to a custom CSS icon class name.
- * @param {number} code - The WMO weather code.
- * @returns {string} - The corresponding CSS class name.
- */
+ 
+// 🎨 Rendering Functions 
+ 
 function getWeatherIconClass(code) {
     if ([0].includes(code)) return "sunny";
     if ([1, 2].includes(code)) return "partCloud";
@@ -441,6 +424,8 @@ function renderCurrentWeather(current, data, city) {
     dateElement.textContent = formattedDate;
     currentTemp.textContent = `${Math.round(currentTempVal)}${tempUnit}`;
     currentWeatherContainer.insertAdjacentHTML("beforeend", weatherHTML);
+
+    checkAndRemoveSkeletonClass()
 }
 
 /**
@@ -525,3 +510,27 @@ function renderHourlyForecast(hourly) {
         hourlyForecastContainer.insertAdjacentHTML("beforeend", cardHTML);
     }
 }
+
+
+   function checkAndRemoveSkeletonClass() {
+            
+   
+            skeletonText.forEach(element => {
+                // Get the text content and trim whitespace (spaces, newlines, tabs)
+                const content = element.textContent.trim();
+                
+                // Check if the trimmed content is NOT an empty string
+                if (content.length > 0) {
+                    
+                    
+                    // 1. Remove the skeleton class
+                    element.classList.remove('skeleton-text');
+                    
+                
+ 
+                }  
+            });
+  
+
+          
+        }
